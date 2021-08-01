@@ -1,8 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from profiles_api import serializers
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
+# TokenAuthentication is used for users to authenticate themselves with our API
+# It works by generating a random token string when the user logs in and then every request they  make to our API that we need to...
+# ...authenticate we add this token string to the request and that's effectively a password to check that every request made is authenticated correctly
+from rest_framework import filters
+
+from profiles_api import serializers
+from profiles_api import models
+from profiles_api import permissions
 
 # As per udemy trainer the status object from the rest framework is a list of handy ...
 # ... HTTP status codes that you can use when returning responses from your API
@@ -119,3 +127,25 @@ class HelloViewSet(viewsets.ViewSet):
         """Handle removing an object"""
 
         return Response({'http_method': 'DELETE'})
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """Handling creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    queryset         = models.UserProfiles.objects.all()
+
+    # Here this is confusing to see that in 'HelloViewSet' there were so many functions defined.
+    # Each function for a HTTP method but here we dint define any of them still our API is working fine. How ?
+    # Here we have inherited ModelViewSet in this class.
+    # This class takes care of all these HTTP Methods as these are very general methods anybody would use.
+    # This means in this class all these methods must be defined in this ModelViewSet and hence we wont require to write this code.
+    # below we will add permissions and TokenAuthentication -->
+    authentication_classes = (TokenAuthentication,)
+    permission_classes     = (permissions.UpdateOwnProfile,)
+    filter_backends        = (filters.SearchFilter,)
+    search_fields          = ('name','email',)
+    # Similar to what I commented in serializer.py file about keywords, I thought that 'filter_backends' and ...
+    # ...'search_fields' are also keywords. Hence I did a quick experiment by jus tweaking the filter_backends to filter_ackens...
+    # ... and 'search_fields' to 'search'. Closed the server and started again. and Yes the filter widget was gone.
+    # Then I first corrected back 'filter_backends' but stop-start the server which dint add the filter widget.
+    # Then I corrected back the 'search_fields' and then stop-start the server which worked and widget was back.
