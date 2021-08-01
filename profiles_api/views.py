@@ -7,6 +7,8 @@ from rest_framework.authentication import TokenAuthentication
 # It works by generating a random token string when the user logs in and then every request they  make to our API that we need to...
 # ...authenticate we add this token string to the request and that's effectively a password to check that every request made is authenticated correctly
 from rest_framework import filters
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
 
 from profiles_api import serializers
 from profiles_api import models
@@ -149,3 +151,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     # ... and 'search_fields' to 'search'. Closed the server and started again. and Yes the filter widget was gone.
     # Then I first corrected back 'filter_backends' but stop-start the server which dint add the filter widget.
     # Then I corrected back the 'search_fields' and then stop-start the server which worked and widget was back.
+
+
+class UserLoginApiView(ObtainAuthToken):
+    """Handle creating user authentication tokens"""
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
