@@ -18,3 +18,13 @@ class UpdateOwnProfile(permissions.BasePermission):
         # Or else it will return value as False which means user is trying to access someother user's profile.
         # [1] Hence with this activated, it will pass True if user is just trying to call HTTP GET method to view another users' profile.
         # [2] Also it will pass True if user is making HTTP PUT or PATCH for his own profile.
+
+class UpdateOwnStatus(permissions.BasePermission):
+    """Allow users to update their own status"""
+
+    def has_object_permission(self, request, view, obj):
+        """Check user is trying to update their own status"""
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return obj.user_profile.id == request.user.id 

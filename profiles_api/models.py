@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
-from django.contrib.auth.models import BaseUserManager
-
 # Above two libs required as base classes when we need to modify the default authentication settings of django.
 # Below we will create a UserProfiles class and will pass the above base classes.
-# Hence as per OOPs Concepts, all the attributes of these two classes will be inheritied by the class we will create.
+# Hence as per OOPs Concepts, all the attributes of these two classes will be inheritied by the class 'UserProfiles' we will create.
+from django.contrib.auth.models import BaseUserManager
+from django.conf import settings  # We are basically importing the settings we have in 'settings.py' file under 'profiles_project'
 
 class UserProfileManager(BaseUserManager):
     """"Manager for user profiles"""
@@ -64,3 +64,17 @@ class UserProfiles(AbstractBaseUser,PermissionsMixin):
         """Return string representation of user"""
         return self.email
         # NOTE : To understand what is __str__, check the Jupyter Notebook 'Python - Basic Programming' under header 'Use of str() in a class'
+
+
+class ProfileFeedItem(models.Model):
+    """Profile Status Update"""
+    user_profile = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete = models.CASCADE
+    )
+    status_text = models.CharField(max_length=255)
+    created_on  = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """Return the model as a string"""
+        return self.status_text
